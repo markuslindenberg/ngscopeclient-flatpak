@@ -1,0 +1,48 @@
+Submodule lib contains modified content
+diff --git a/lib/scopehal/scopehal.cpp b/lib/scopehal/scopehal.cpp
+index 89a32099..8e035d19 100644
+--- a/lib/scopehal/scopehal.cpp
++++ b/lib/scopehal/scopehal.cpp
+@@ -696,6 +696,10 @@ void InitializeSearchPaths()
+ 	//for macports
+ 	g_searchPaths.push_back("/opt/local/share/ngscopeclient");
+ 	g_searchPaths.push_back("/opt/local/share/scopehal");
++
++	//for flatpak
++	g_searchPaths.push_back("/app/share/ngscopeclient");
++	g_searchPaths.push_back("/app/share/scopehal");
+ #endif
+ 
+ 	//TODO: add system directories for Windows (%appdata% etc)?
+diff --git a/src/ngscopeclient/IGFDFileBrowser.cpp b/src/ngscopeclient/IGFDFileBrowser.cpp
+index 8c041de..cd93f69 100644
+--- a/src/ngscopeclient/IGFDFileBrowser.cpp
++++ b/src/ngscopeclient/IGFDFileBrowser.cpp
+@@ -56,7 +56,7 @@ IGFDFileBrowser::IGFDFileBrowser(
+ 	//TODO: read bookmarks on other OSes
+ 	#ifdef __linux__
+ 		string home = getenv("HOME");
+-		string path = home + "/.config/gtk-3.0/bookmarks";
++		string path = home + "/.var/app/org.ngscopeclient.Ngscopeclient/config/gtk-3.0/bookmarks";
+ 		FILE* fp = fopen(path.c_str(), "r");
+ 		if(fp)
+ 		{
+diff --git a/src/ngscopeclient/PreferenceManager.cpp b/src/ngscopeclient/PreferenceManager.cpp
+index 9d4d2e4..4298bfc 100644
+--- a/src/ngscopeclient/PreferenceManager.cpp
++++ b/src/ngscopeclient/PreferenceManager.cpp
+@@ -106,11 +106,10 @@ void PreferenceManager::DeterminePath()
+ 	CoTaskMemFree(static_cast<void*>(stem));
+ #else
+ 	// Ensure all directories in path exist
+-	CreateDirectory("~/.config");
+-	CreateDirectory("~/.config/ngscopeclient");
+-	m_configDir = ExpandPath("~/.config/ngscopeclient");
++	CreateDirectory("~/.var/app/org.ngscopeclient.Ngscopeclient/config/ngscopeclient");
++	m_configDir = ExpandPath("~/.var/app/org.ngscopeclient.Ngscopeclient/config/ngscopeclient");
+ 
+-	m_filePath = ExpandPath("~/.config/ngscopeclient/preferences.yml");
++	m_filePath = ExpandPath("~/.var/app/org.ngscopeclient.Ngscopeclient/config/ngscopeclient/preferences.yml");
+ #endif
+ }
+ 

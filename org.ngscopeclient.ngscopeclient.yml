@@ -1,0 +1,147 @@
+app-id: org.ngscopeclient.Ngscopeclient
+runtime: org.freedesktop.Platform
+runtime-version: '23.08'
+sdk: org.freedesktop.Sdk
+command: ngscopeclient
+rename-desktop-file: ngscopeclient.desktop
+
+finish-args:
+  - "--share=network"
+  - "--share=ipc"
+  - "--socket=x11"
+  - "--device=all"
+  - "--filesystem=home"
+
+modules:
+
+  - name: mm-common
+    buildsystem: meson
+    sources:
+      - type: archive
+        url: https://download.gnome.org/sources/mm-common/1.0/mm-common-1.0.5.tar.xz
+        sha256: 705c6d29f4116a29bde4e36cfc1b046c92b6ef8c6dae4eaec85018747e6da5aa
+    cleanup:
+      - "/bin"
+      - "/share"
+
+  - name: sigc++
+    buildsystem: meson
+    config-opts:
+      - "-Dvalidation=false"
+      - "-Dbuild-documentation=false"
+      - "-Dbuild-examples=false"
+      - "-Dbuild-tests=false"
+    sources:
+      - type: git
+        url: 
+        url: https://download.gnome.org/sources/libsigc%2B%2B/2.12/libsigc%2B%2B-2.12.1.tar.xz
+        sha256: a9dbee323351d109b7aee074a9cb89ca3e7bcf8ad8edef1851f4cf359bd50843
+    cleanup:
+      - "/include"
+      - "/lib/pkgconfig"
+      - "/lib/sigc++-2.0"
+
+  - name: cairomm
+    buildsystem: meson
+    config-opts:
+      - "-Dbuild-documentation=false"
+      - "-Dbuild-examples=false"
+      - "-Dbuild-tests=false"
+    sources:
+      - type: git
+        url: https://gitlab.freedesktop.org/cairo/cairomm.git
+        tag: "1.14.5"
+    cleanup:
+      - "/include"
+      - "/lib/pkgconfig"
+      - "/lib/cairomm-1.0"
+
+  - name: glfw
+    buildsystem: cmake
+    builddir: true
+    config-opts:
+      - "-DCMAKE_BUILD_TYPE=Release"
+      - "-DBUILD_SHARED_LIBS=ON"
+      - "-DGLFW_BUILD_EXAMPLES=OFF"
+      - "-DGLFW_BUILD_TESTS=OFF"
+      - "-DGLFW_BUILD_DOCS=OFF"
+    sources:
+      - type: git
+        url: https://github.com/glfw/glfw.git
+        tag: "3.3.9"
+    cleanup:
+      - "/include"
+      - "/lib/pkgconfig"
+      - "/lib/cmake"
+      - "/lib/*.a"
+
+  - name: yaml-cpp
+    buildsystem: cmake
+    builddir: true
+    config-opts:
+      - "-DYAML_BUILD_SHARED_LIBS=ON"
+      - "-DYAML_CPP_BUILD_TESTS=OFF"
+    sources:
+      - type: git
+        url: https://github.com/jbeder/yaml-cpp.git
+        tag: "0.8.0"
+    cleanup:
+      - "/include"
+      - "/lib/cmake"
+      - "/lib/pkgconfig"
+
+  - name: ffts
+    buildsystem: cmake
+    builddir: true
+    config-opts:
+      - "-DENABLE_SHARED=ON"
+    sources:
+      - type: git
+        url: https://github.com/anthonix/ffts.git
+    cleanup:
+      - "/include"
+      - "/lib/*.a"
+      - "/lib/pkgconfig"
+
+  # glslc
+  - name: shaderc
+    buildsystem: cmake
+    builddir: true
+    config-opts:
+      - "-DCMAKE_BUILD_TYPE=Release"
+      - "-DSHADERC_SKIP_TESTS=ON"
+      - "-DSHADERC_SKIP_EXAMPLES=ON"
+    sources:
+      - type: git
+        url: https://github.com/google/shaderc.git
+        tag: v2023.7
+      - type: git
+        url: https://github.com/KhronosGroup/glslang.git
+        commit: 48f9ed8b08be974f4e463ef38136c8f23513b2cf
+        dest: third_party/glslang
+      - type: git
+        url: https://github.com/KhronosGroup/SPIRV-Headers.git
+        commit: 4183b260f4cccae52a89efdfcdd43c4897989f42
+        dest: third_party/spirv-headers
+      - type: git
+        url: https://github.com/KhronosGroup/SPIRV-Tools.git
+        commit: 360d469b9eac54d6c6e20f609f9ec35e3a5380ad
+        dest: third_party/spirv-tools
+    cleanup:
+      - "/bin"
+      - "/include"
+      - "/lib"
+
+  - name: scopehal-apps
+    buildsystem: cmake
+    builddir: true
+    config-opts:
+      - "-DCMAKE_BUILD_TYPE=Release"
+      - "-DBUILD_DOCS=OFF"
+      - "-DBUILD_TESTING=OFF"
+      - "-DANALYZE=OFF"
+    sources:
+      - type: git
+        url: https://github.com/ngscopeclient/scopehal-apps.git
+      - type: patch
+        path: flatpak_paths.patch
